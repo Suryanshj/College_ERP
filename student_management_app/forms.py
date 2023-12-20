@@ -1,5 +1,5 @@
 from django import forms
-from .models import Courses, SessionYearModel
+from .models import Courses, SessionYearModel, Document
 
 
 class DateInput(forms.DateInput):
@@ -24,7 +24,7 @@ class AddStudentForm(forms.Form):
     except:
         print("here")
         course_list = []
-    
+
     #For Displaying Session Years
     try:
         session_years = SessionYearModel.objects.all()
@@ -32,15 +32,15 @@ class AddStudentForm(forms.Form):
         for session_year in session_years:
             single_session_year = (session_year.id, str(session_year.session_start_year)+" to "+str(session_year.session_end_year))
             session_year_list.append(single_session_year)
-            
+
     except:
         session_year_list = []
-    
+
     gender_list = (
         ('Male','Male'),
         ('Female','Female')
     )
-    
+
     course_id = forms.ChoiceField(label="Course", choices=course_list, widget=forms.Select(attrs={"class":"form-control"}))
     gender = forms.ChoiceField(label="Gender", choices=gender_list, widget=forms.Select(attrs={"class":"form-control"}))
     session_year_id = forms.ChoiceField(label="Session Year", choices=session_year_list, widget=forms.Select(attrs={"class":"form-control"}))
@@ -74,19 +74,32 @@ class EditStudentForm(forms.Form):
         for session_year in session_years:
             single_session_year = (session_year.id, str(session_year.session_start_year)+" to "+str(session_year.session_end_year))
             session_year_list.append(single_session_year)
-            
+
     except:
         session_year_list = []
 
-    
+
     gender_list = (
         ('Male','Male'),
         ('Female','Female')
     )
-    
+
     course_id = forms.ChoiceField(label="Course", choices=course_list, widget=forms.Select(attrs={"class":"form-control"}))
     gender = forms.ChoiceField(label="Gender", choices=gender_list, widget=forms.Select(attrs={"class":"form-control"}))
     session_year_id = forms.ChoiceField(label="Session Year", choices=session_year_list, widget=forms.Select(attrs={"class":"form-control"}))
     # session_start_year = forms.DateField(label="Session Start", widget=DateInput(attrs={"class":"form-control"}))
     # session_end_year = forms.DateField(label="Session End", widget=DateInput(attrs={"class":"form-control"}))
     profile_pic = forms.FileField(label="Profile Pic", required=False, widget=forms.FileInput(attrs={"class":"form-control"}))
+
+class DocumentUploadForm(forms.ModelForm):
+    class Meta:
+        model = Document
+        fields = ['title', 'file']
+
+class DeleteDocumentForm(forms.Form):
+    document = forms.ModelChoiceField(queryset=Document.objects.all())
+    def clean_document(self):
+        document = self.cleaned_data['document']
+        if document.uploaded_by != self.request.user:
+            raise forms.ValidationError("You can only delete documents you uploaded.")
+        return document

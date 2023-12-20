@@ -44,11 +44,11 @@
                                 </div>
                                 </div>
                                 {% endif %}
-                            
+
                     <form method="POST" action="{% url 'student_apply_leave_save' %}">
                         {% csrf_token %}
                         <div class="card-body">
-                           
+
                             <div class="form-group">
                                 <label>Leave Date </label>
                                 <input type="date" name="leave_date" class="form-control" required/>
@@ -95,7 +95,7 @@
                                         <th>Status</th>
                                     </tr>
                                     </thead>
-                                    
+
                                     {% for leave in leave_data %}
                                     <tr>
                                         <td>{{ leave.id }}</td>

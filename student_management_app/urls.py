@@ -24,6 +24,10 @@ urlpatterns = [
     path('student_profile/', StudentViews.student_profile, name="student_profile"),
     path('student_profile_update/', StudentViews.student_profile_update, name="student_profile_update"),
     path('student_view_result/', StudentViews.student_view_result, name="student_view_result"),
+    path('upload_document/', StudentViews.upload_document, name='upload_document'),
+    path('document_list/', StudentViews.document_list, name='document_list'),
+    path('delete-document/<int:document_pk>/', StudentViews.delete_document, name='delete_document'),
+
 
 
      # URLS for Staff

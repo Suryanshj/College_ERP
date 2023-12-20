@@ -1,4 +1,4 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.http import HttpResponse, HttpResponseRedirect
 from django.contrib import messages
 from django.core.files.storage import FileSystemStorage #To upload Profile Picture
@@ -6,7 +6,8 @@ from django.core.files.storage import FileSystemStorage #To upload Profile Pictu
 from django.urls import reverse
 import datetime # To Parse input DateTime into Python Date Time Object
 
-from .models import CustomUser, Staffs, Courses, Subjects, Students, Attendance, AttendanceReport, LeaveReportStudent, FeedBackStudent, StudentResult
+from .models import CustomUser, Staffs, Courses, Subjects, Students, Attendance, AttendanceReport, LeaveReportStudent, FeedBackStudent, StudentResult,Document
+from .forms import DocumentUploadForm, DeleteDocumentForm
 
 
 def student_home(request):
@@ -198,3 +199,36 @@ def student_view_result(request):
         "student_result": student_result,
     }
     return render(request, "student_template/student_view_result.html", context)
+
+def upload_document(request):
+    if request.method == 'POST':
+        form = DocumentUploadForm(request.POST, request.FILES)
+        if form.is_valid():
+            title = form.cleaned_data['title']
+            if Document.objects.filter(title=title).exists():
+                return render(request, 'student_template/upload_document.html', {'form': form, 'error_message': 'Title already exists. Choose a different title.'})
+            else:
+                form.save()
+                return redirect('document_list')
+    else:
+        form = DocumentUploadForm()
+
+    return render(request, 'student_template/upload_document.html', {'form': form})
+
+def document_list(request):
+    documents = Document.objects.all()
+    context = {'documents': documents}
+    return render(request, 'student_template/document_list.html', context)
+
+def delete_document(request, document_pk):
+    document = Document.objects.get(pk=document_pk)
+    if request.method == 'POST':
+        document.delete()
+        return redirect('document_list')
+        if form.is_valid():
+            document.delete()
+            return redirect('student_template/document_list')
+    else:
+        form = DeleteDocumentForm()
+        context = {'document': document, 'form': form}
+        return render(request, 'student_template/delete_document.html', context)
