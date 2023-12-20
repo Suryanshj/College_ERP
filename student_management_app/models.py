@@ -179,6 +179,10 @@ from django.contrib.auth.models import AbstractUser
 from django.db import models
 from django.db.models.signals import post_save
 from django.dispatch import receiver
+from django.contrib.auth.models import User
+import os
+import uuid
+
 
 
 
@@ -353,6 +357,18 @@ class StudentResult(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     objects = models.Manager()
+
+def get_upload_path(instance, filename):
+    _, extension = os.path.splitext(filename)
+    unique_filename = f"{uuid.uuid4()}{extension}"
+    return os.path.join('documents/', unique_filename)
+
+class Document(models.Model):
+    title = models.CharField(max_length=255, unique=True)
+    file = models.FileField(upload_to=get_upload_path)
+
+    def __str__(self):
+        return self.title
 
 
 #Creating Django Signals
